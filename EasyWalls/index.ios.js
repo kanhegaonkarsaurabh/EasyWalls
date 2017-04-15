@@ -13,6 +13,31 @@ import {
 } from 'react-native';
 
 export default class EasyWalls extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      WallsJSON : [],
+      isLoading : true
+    };
+  }
+
+  fetchWallsJSON() {
+    var url = 'http://unsplash.it/list';
+    fetch(url)
+      .then ( response => response.json() )
+      .then( jsonData => {
+          console.log(jsonData);
+      })
+      .catch(error => console.log('Fetch Error : ' + error));
+  }
+
+  //Lifecycle methods
+
+  componentDidMount() {
+    this.fetchWallsJSON();
+  }
+
   render() {
     return (
       <View style={styles.container}>
