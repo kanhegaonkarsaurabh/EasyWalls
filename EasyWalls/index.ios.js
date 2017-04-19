@@ -9,70 +9,75 @@ import {
   AppRegistry,
   StyleSheet,
   Text,
-  View
+  View,
+  ActivityIndicator,
 } from 'react-native';
 
+const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#000',
+  },
+
+});
 export default class EasyWalls extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      WallsJSON : [],
-      isLoading : true
+      wallsJSON: [],
+      isLoading: true,
     };
   }
-
-  fetchWallsJSON() {
-    var url = 'http://unsplash.it/list';
-    fetch(url)
-      .then ( response => response.json() )
-      .then( jsonData => {
-          console.log(jsonData);
-      })
-      .catch(error => console.log('Fetch Error : ' + error));
-  }
-
-  //Lifecycle methods
 
   componentDidMount() {
     this.fetchWallsJSON();
   }
 
   render() {
+    let { isLoading } = this.state;
+    if (isLoading)
+      return this.renderLoadingMessage();
+    else
+      return this.renderResults();
+  }
+
+  fetchWallsJSON() {
+    const url = 'http://unsplash.it/list';
+    // It causes a JSON error with network request.
+    // This is because Xcode only allows https and not http. fixed at stack overflow
+    fetch(url)
+      .then(response => response.json())
+      .then((jsonData) => {
+        console.log(jsonData);
+        this.setState({ isLoading: false });// Change isLoading until JSON data loads
+      })
+      .catch(error => console.log('Fetch Error : ' + error));
+  }
+
+  renderLoadingMessage() {
     return (
-      <View style={styles.container}>
-        <Text style={styles.welcome}>
-          Welcome to React Native!
-        </Text>
-        <Text style={styles.instructions}>
-          To get started, edit index.ios.js
-        </Text>
-        <Text style={styles.instructions}>
-          Press Cmd+R to reload,{'\n'}
-          Cmd+D or shake for dev menu
-        </Text>
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator
+          animating={true}
+          color={'#fff'}
+          size={'large'}
+          style={{margin: 5}}
+        />
+        <Text style={{ color: '#fff' }} >Contacting Unsplash </Text>
+      </View>
+    );
+  }
+
+  renderResults() {
+    return (
+      <View>
+        <Text> Data Loaded </Text>
       </View>
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
-  },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
-});
-
 AppRegistry.registerComponent('EasyWalls', () => EasyWalls);
