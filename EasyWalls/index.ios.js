@@ -13,6 +13,8 @@ import {
   ActivityIndicator,
 } from 'react-native';
 
+let RandManager = require('./RandManager.js');
+
 const styles = StyleSheet.create({
   loadingContainer: {
     flex: 1,
@@ -23,6 +25,8 @@ const styles = StyleSheet.create({
   },
 
 });
+
+const NUM_WALLPAPERS = 7;
 export default class EasyWalls extends Component {
   constructor(props) {
     super(props);
@@ -37,6 +41,11 @@ export default class EasyWalls extends Component {
     this.fetchWallsJSON();
   }
 
+  check() {
+    return (
+      <Text>Data has been loaded </Text>
+    );
+  }
   render() {
     let { isLoading } = this.state;
     if (isLoading)
@@ -52,8 +61,15 @@ export default class EasyWalls extends Component {
     fetch(url)
       .then(response => response.json())
       .then((jsonData) => {
-        console.log(jsonData);
-        this.setState({ isLoading: false });// Change isLoading until JSON data loads
+        let randomID = RandManager.uniqueRandomNumbers(NUM_WALLPAPERS, 0, jsonData.length);
+        let walls = [];
+        Array.from(randomID).forEach(randomID => {
+          walls.push(jsonData[randomID]);
+        });
+        this.setState({
+          isLoading: false,
+          wallsJSON: [].concat(walls)
+        });// Change isLoading until JSON data loads
       })
       .catch(error => console.log('Fetch Error : ' + error));
   }
@@ -73,11 +89,22 @@ export default class EasyWalls extends Component {
   }
 
   renderResults() {
-    return (
-      <View>
-        <Text> Data Loaded </Text>
-      </View>
-    );
+    let { wallsJSON, isLoading } = this.state;
+    if( !isLoading) {
+      return (
+          <View>
+            { wallsJSON.map((wallpaper, index) => {
+              return (
+                <Text key={index}>
+                  {wallpaper.author}
+                  </Text>
+              );
+              })}
+          </View>
+
+
+      );
+    }
   }
 }
 AppRegistry.registerComponent('EasyWalls', () => EasyWalls);
