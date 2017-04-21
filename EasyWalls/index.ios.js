@@ -12,6 +12,7 @@ import {
   View,
   ActivityIndicator,
 } from 'react-native';
+import Swiper from 'react-native-swiper';
 
 let RandManager = require('./RandManager.js');
 
@@ -92,17 +93,19 @@ export default class EasyWalls extends Component {
     let { wallsJSON, isLoading } = this.state;
     if( !isLoading) {
       return (
-          <View>
-            { wallsJSON.map((wallpaper, index) => {
-              return (
-                <Text key={index}>
-                  {wallpaper.author}
-                  </Text>
-              );
-              })}
-          </View>
-
-
+        <Swiper showsPagination = {false}
+                showsHorizontalScrollIndicator = {true}
+                onMomentumScrollEnd = {this.onMomentumScrollEnd}
+                loop = {false}
+        >
+          { wallsJSON.map((wallpaper, index) => {
+            return (
+              <Text key={index}>
+                {wallpaper.author}
+              </Text>
+            );
+          })}
+        </Swiper>
       );
     }
   }
